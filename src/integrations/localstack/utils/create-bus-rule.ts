@@ -3,6 +3,9 @@ import { EventBridgeClient, PutRuleCommand } from '@aws-sdk/client-eventbridge';
 export interface RoleResourceTarget {
   Id: string;
   Arn: { Ref: string };
+  SqsParameters?: {
+    MessageGroupId?: string;
+  };
 }
 
 export interface RuleResourceProperties {

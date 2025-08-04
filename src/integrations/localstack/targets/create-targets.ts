@@ -16,6 +16,7 @@ import {
   listRuleTargets,
 } from '../utils';
 import { snsTargetHandler } from './target-handlers/sns-target-handler';
+import { sqsTargetHandler } from './target-handlers/sqs-target-handler';
 
 export interface CreateTargetsParams {
   resources: CloudFormationResources;
@@ -59,7 +60,7 @@ export async function createTargets({
       const targetId = targetResource.Id;
 
       const doesNotExist = !existingTargetsForRule.some(
-        (existingTarget) => existingTarget.Id === targetId
+        (existingTarget: Target) => existingTarget.Id === targetId
       );
 
       if (doesNotExist) {
@@ -84,6 +85,7 @@ export async function createTargets({
 
   const ruleTargets = [...notExistingTargets].map((resourceTarget) => {
     let Arn: string;
+    let sqsParameters: any;
 
     const targetResource = resources[resourceTarget.Arn.Ref];
 
@@ -95,6 +97,16 @@ export async function createTargets({
         }).arn;
         break;
       }
+      case ServerlessResourceTypes.SQS_QUEUE: {
+        const sqsResult = sqsTargetHandler({
+          targetResource,
+          awsConfig: config?.awsConfig,
+          roleResourceTarget: resourceTarget,
+        });
+        Arn = sqsResult.arn;
+        sqsParameters = sqsResult.sqsParameters;
+        break;
+      }
       default: {
         throw new Error(
           `Resource type ${targetResource.Type} not implemented.`
@@ -102,7 +114,11 @@ export async function createTargets({
       }
     }
 
-    const result: Target = { Id: resourceTarget.Id, Arn };
+    const result: Target = {
+      Id: resourceTarget.Id,
+      Arn,
+      ...(sqsParameters && { SqsParameters: sqsParameters }),
+    };
 
     return result;
   });

@@ -1,9 +1,9 @@
 {
-  "name": "serverless-offline-aws-eventbridge",
-  "version": "2.2.3-beta.1",
-  "description": "Serverless plugin to run event bridge offline. Localstack support.",
+  "name": "serverless-offline-aws-eventbridge-v2",
+  "version": "1.0.0",
+  "description": "Serverless plugin to run event bridge offline. Localstack support. Forked from https://github.com/rubenkaiser/serverless-offline-eventBridge by Ruben Kaiser",
   "main": "dist/src/index.js",
-  "author": "Ruben Kaiser",
+  "author": "Rowinbot",
   "license": "MIT",
   "scripts": {
     "build": "tsc -p .",
@@ -48,7 +48,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rubenkaiser/serverless-offline-eventBridge.git"
+    "url": "git@github.com:rowinbot/serverless-offline-eventBridge-v2.git"
   },
   "keywords": [
     "serverless",
@@ -57,7 +57,7 @@
     "localstack"
   ],
   "bugs": {
-    "url": "https://github.com/rubenkaiser/serverless-offline-eventBridge/issues"
+    "url": "https://github.com/rowinbot/serverless-offline-eventBridge-v2/issues"
   },
-  "homepage": "https://github.com/rubenkaiser/serverless-offline-eventBridge#readme"
+  "homepage": "https://github.com/rowinbot/serverless-offline-eventBridge-v2#readme"
 }
