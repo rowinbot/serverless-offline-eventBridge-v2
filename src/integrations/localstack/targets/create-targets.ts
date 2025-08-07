@@ -36,26 +36,33 @@ function findResourceByTarget(
 ) {
   let result: CloudFormationResource | null = null;
 
-  if (roleResourceTarget.Arn.Ref) {
-    if ('Fn::GetAtt' in roleResourceTarget.Arn) {
-      const getAtt = roleResourceTarget.Arn['Fn::GetAtt'] as [
-        string,
-        keyof CloudFormationResource
-      ];
-      const [resourceName, attribute] = getAtt;
-      result = (resources[resourceName][attribute] ??
-        null) as CloudFormationResource | null;
-    }
-
-    result = resources[roleResourceTarget.Arn.Ref] ?? null;
-  }
-
   if (roleResourceTarget.Id) {
     result = resources[roleResourceTarget.Id] ?? null;
   }
 
+  if ('Ref' in roleResourceTarget.Arn) {
+    result = resources[roleResourceTarget.Arn.Ref] ?? null;
+  }
+
+  if ('Fn::GetAtt' in roleResourceTarget.Arn) {
+    const getAtt = roleResourceTarget.Arn['Fn::GetAtt'] as [
+      string,
+      keyof CloudFormationResource
+    ];
+
+    const [resourceName] = getAtt;
+
+    result = resources[resourceName] ?? null;
+  }
+
   if (!result) {
-    throw new Error(`Resource not found: ${roleResourceTarget.Arn.Ref}`);
+    throw new Error(
+      `Resource not found: ${
+        'Ref' in roleResourceTarget.Arn
+          ? roleResourceTarget.Arn.Ref
+          : roleResourceTarget.Arn['Fn::GetAtt'][1]
+      }`
+    );
   }
 
   return result;

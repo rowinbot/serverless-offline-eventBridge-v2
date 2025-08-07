@@ -2,7 +2,7 @@ import { EventBridgeClient, PutRuleCommand } from '@aws-sdk/client-eventbridge';
 
 export interface RoleResourceTarget {
   Id: string;
-  Arn: { Ref: string };
+  Arn: { Ref: string } | { 'Fn::GetAtt': [string, string] };
   SqsParameters?: {
     MessageGroupId?: string;
   };
