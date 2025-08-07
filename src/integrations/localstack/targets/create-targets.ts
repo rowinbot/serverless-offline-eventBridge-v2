@@ -4,7 +4,10 @@ import {
   Rule,
   Target,
 } from '@aws-sdk/client-eventbridge';
-import { CloudFormationResources } from 'serverless/aws';
+import {
+  CloudFormationResource,
+  CloudFormationResources,
+} from 'serverless/aws';
 import {
   ServerlessResourceTypes,
   filterResources,
@@ -25,6 +28,37 @@ export interface CreateTargetsParams {
   rule: Rule;
   bus: EventBus;
   logDebug: (message: string) => void;
+}
+
+function findResourceByTarget(
+  resources: CloudFormationResources,
+  roleResourceTarget: RoleResourceTarget
+) {
+  let result: CloudFormationResource | null = null;
+
+  if (roleResourceTarget.Arn.Ref) {
+    if ('Fn::GetAtt' in roleResourceTarget.Arn) {
+      const getAtt = roleResourceTarget.Arn['Fn::GetAtt'] as [
+        string,
+        keyof CloudFormationResource
+      ];
+      const [resourceName, attribute] = getAtt;
+      result = (resources[resourceName][attribute] ??
+        null) as CloudFormationResource | null;
+    }
+
+    result = resources[roleResourceTarget.Arn.Ref] ?? null;
+  }
+
+  if (roleResourceTarget.Id) {
+    result = resources[roleResourceTarget.Id] ?? null;
+  }
+
+  if (!result) {
+    throw new Error(`Resource not found: ${roleResourceTarget.Arn.Ref}`);
+  }
+
+  return result;
 }
 
 export async function createTargets({
@@ -87,7 +121,7 @@ export async function createTargets({
     let Arn: string;
     let sqsParameters: any;
 
-    const targetResource = resources[resourceTarget.Arn.Ref];
+    const targetResource = findResourceByTarget(resources, resourceTarget);
 
     switch (targetResource.Type) {
       case ServerlessResourceTypes.SNS_TOPIC: {
