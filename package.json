@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline-aws-eventbridge-v2",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Serverless plugin to run event bridge offline. Localstack support. Forked from https://github.com/rubenkaiser/serverless-offline-eventBridge by Ruben Kaiser",
   "main": "dist/src/index.js",
   "author": "Rowinbot",
