@@ -20,6 +20,7 @@ import {
 } from '../utils';
 import { snsTargetHandler } from './target-handlers/sns-target-handler';
 import { sqsTargetHandler } from './target-handlers/sqs-target-handler';
+import { logsTargetHandler } from './target-handlers/logs-target-handler';
 
 export interface CreateTargetsParams {
   resources: CloudFormationResources;
@@ -146,6 +147,13 @@ export async function createTargets({
         });
         Arn = sqsResult.arn;
         sqsParameters = sqsResult.sqsParameters;
+        break;
+      }
+      case ServerlessResourceTypes.LOGS_LOG_GROUP: {
+        Arn = logsTargetHandler({
+          targetResource,
+          awsConfig: config?.awsConfig,
+        }).arn;
         break;
       }
       default: {
